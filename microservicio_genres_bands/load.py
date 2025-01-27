@@ -2,6 +2,42 @@ import requests
 import concurrent.futures
 import time
 
+
+import requests
+import concurrent.futures
+
+# URL del endpoint
+endpoints = 'http://localhost:8000/api/genres'
+
+def realizar_solicitudes(peticion):
+    try:
+        respuesta = requests.get(endpoints)
+        if respuesta.status_code == 200:
+            print(f"Solicitud #{peticion} exitosa")
+        else:
+            print(f"Error en solicitud #{peticion}: {respuesta.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error en solicitud #{peticion}: {e}")
+
+# Número de solicitudes concurrentes (número de hilos)
+num_peticiones = 5
+
+# Crear hilos para realizar solicitudes concurrentes
+with concurrent.futures.ThreadPoolExecutor(max_workers=num_peticiones) as executor:
+    tareas_pendientes = []
+    for i in range(num_peticiones):
+        # Enviar la solicitud de manera asíncrona utilizando el método submit
+        tarea_pendiente = executor.submit(realizar_solicitudes, i)
+        # Guardar la tarea pendiente en la lista de tareas pendientes
+        tareas_pendientes.append(tarea_pendiente)
+
+    for tarea_pendiente in tareas_pendientes:
+        # Esperar a que la tarea pendiente se complete
+        tarea_pendiente.result()
+
+print("Todas las solicitudes han finalizado")
+
+""" 
 # Configuración de los endpoints y sus métodos
 ENDPOINTS = {
     "get_all_bands": {"url": "http://localhost:8000/api/bands", "method": "GET"},
@@ -67,36 +103,4 @@ if __name__ == "__main__":
         probar_endpoint(endpoint_name, num_peticiones)
 
 
-""" import requests
-import concurrent.futures
-
-# URL del endpoint
-endpoints = 'http://localhost:8000/api/genres'
-
-def realizar_solicitudes(peticion):
-    try:
-        respuesta = requests.get(endpoints)
-        if respuesta.status_code == 200:
-            print(f"Solicitud #{peticion} exitosa")
-        else:
-            print(f"Error en solicitud #{peticion}: {respuesta.status_code}")
-    except requests.exceptions.RequestException as e:
-        print(f"Error en solicitud #{peticion}: {e}")
-
-# Número de solicitudes concurrentes (número de hilos)
-num_peticiones = 5
-
-# Crear hilos para realizar solicitudes concurrentes
-with concurrent.futures.ThreadPoolExecutor(max_workers=num_peticiones) as executor:
-    tareas_pendientes = []
-    for i in range(num_peticiones):
-        # Enviar la solicitud de manera asíncrona utilizando el método submit
-        tarea_pendiente = executor.submit(realizar_solicitudes, i)
-        # Guardar la tarea pendiente en la lista de tareas pendientes
-        tareas_pendientes.append(tarea_pendiente)
-
-    for tarea_pendiente in tareas_pendientes:
-        # Esperar a que la tarea pendiente se complete
-        tarea_pendiente.result()
-
-print("Todas las solicitudes han finalizado") """
+ """
